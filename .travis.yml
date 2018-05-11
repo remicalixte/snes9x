@@ -1,0 +1,16 @@
+sudo: required
+language: cpp
+git:
+  submodules: false
+services:
+  - docker
+before_install:
+  - docker pull ubuntu:latest
+  - docker run -itd --name build --volume "$(pwd)"/:/repo ubuntu
+  - docker exec build apt-get update
+  - docker exec build apt-get -y install build-essential intltool libgtk-3-dev libxml2-dev libepoxy-dev libpulse-dev libasound2-dev libsdl2-dev libminizip-dev
+
+script:
+  - docker exec build sh -c "cd /repo/gtk/ && ./autogen.sh"
+  - docker exec build sh -c "cd /repo/gtk/ && ./configure --with-netplay --with-opengl --without-system-zip"
+  - docker exec build sh -c "cd /repo/gtk/ && make"
